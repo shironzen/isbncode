@@ -39,16 +39,14 @@ import org.json.JSONObject
 import java.net.URL
 import androidx.compose.foundation.combinedClickable
 
-// ---------- 1. Модель данных: одна книга ----------
+//класс книга
 data class Book(
     val isbn: String,
     val title: String,
     val author: String
 )
 
-// ---------- 2. Хранение: сохраняем список в памяти телефона ----------
-// SharedPreferences - это простое хранилище "ключ -> строка".
-// Список книг превращаем в JSON-текст и кладём под одним ключом.
+// хранение
 private const val PREFS_NAME = "books_prefs"
 private const val KEY_BOOKS = "books"
 
@@ -79,8 +77,7 @@ fun loadBooks(context: Context): List<Book> {
     return result
 }
 
-// ---------- 3. Интернет: ищем название и автора по ISBN в Google Books ----------
-// suspend + Dispatchers.IO = выполняем в фоне, чтобы не вешать экран.
+// связь с инетом
 suspend fun fetchBook(isbn: String): Book = withContext(Dispatchers.IO) {
     try {
         // Используем Open Library API (не блокируется в РФ)
@@ -110,7 +107,7 @@ suspend fun fetchBook(isbn: String): Book = withContext(Dispatchers.IO) {
     }
 }
 
-// ---------- 4. Экран ----------
+// экран
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -128,11 +125,11 @@ fun BookCatalogScreen() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    // Когда меняются эти переменные, экран сам перерисовывается
+    // когда меняются переменные, экран сам перерисовывается
     var books by remember { mutableStateOf(loadBooks(context)) }
     var message by remember { mutableStateOf("") }
 
-    // Запуск сканера Google (камера открывается сама, разрешение не нужно)
+    //запуск сканера гугла
     fun startScan() {
         val options = GmsBarcodeScannerOptions.Builder()
             .setBarcodeFormats(Barcode.FORMAT_EAN_13) // ISBN на книгах - это EAN-13
@@ -161,7 +158,7 @@ fun BookCatalogScreen() {
             }
     }
 
-    // Функция для удаления книги
+    // удаление книги
     fun deleteBook(bookToDelete: Book) {
         android.app.AlertDialog.Builder(context)
             .setTitle("Удалить книгу?")
